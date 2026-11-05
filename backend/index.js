@@ -5,6 +5,7 @@ import connectDB from "./config/database.js";
 import sessionMiddleware from "./config/session.js";
 import authRoutes from "./routes/authRoutes.js";
 import serviceRouter from "./routes/serviceRoutes.js";
+import appointmentRouter from "./routes/appointmentRoutes.js"
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -42,6 +43,7 @@ app.get("/api/health", (req, res) => {
 // Authentication routes
 app.use("/api/auth", authRoutes);
 app.use("/api/services", serviceRouter);
+app.use("/api/appointments", appointmentRouter)
 
 // Start only after the database connects.
 const startServer = async () => {
