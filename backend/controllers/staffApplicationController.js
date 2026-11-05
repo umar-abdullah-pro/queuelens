@@ -158,3 +158,124 @@ export const getPendingStaffApplications = async (req, res) => {
     });
   }
 };
+
+//4. admin approval of staff applications
+export const approveStaffApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 1. Validate application ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid application ID",
+      });
+    }
+
+    // 2. Find pending application
+    const application = await StaffApplication.findOne({
+      _id: id,
+      status: "PENDING",
+    });
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: "Pending staff application not found",
+      });
+    }
+
+    // 3. Check whether email already belongs to a user
+    const existingUser = await User.findOne({
+      email: application.email,
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: "A user with this email already exists",
+      });
+    }
+
+    // 4. Approve application
+    application.status = "APPROVED";
+    application.reviewedBy = req.user.id;
+    application.reviewedAt = new Date();
+
+    await application.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Staff application approved successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Approve staff application error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to approve staff application",
+    });
+  }
+};
+
+//5. Reject staff application
+export const rejectStaffApplication = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rejectionReason } = req.body;
+
+    // 1. Validate application ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid application ID",
+      });
+    }
+
+    // 2. Validate rejection reason
+    if (
+      typeof rejectionReason !== "string" ||
+      !rejectionReason.trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Rejection reason is required",
+      });
+    }
+
+    // 3. Find pending application
+    const application = await StaffApplication.findOne({
+      _id: id,
+      status: "PENDING",
+    });
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: "Pending staff application not found",
+      });
+    }
+
+    // 4. Update application
+    application.status = "REJECTED";
+    application.rejectionReason = rejectionReason.trim();
+    application.reviewedBy = req.user.id;
+    application.reviewedAt = new Date();
+
+    await application.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Staff application rejected successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Reject staff application error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to reject staff application",
+    });
+  }
+};

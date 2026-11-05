@@ -1,9 +1,40 @@
 import express from "express";
-import { createStaffApplication } from "../controllers/staffApplicationController.js";
 
-const staffApplicationRouter = express.Router();
+import {
+  createStaffApplication,
+  getPendingStaffApplications,
+  approveStaffApplication,
+  rejectStaffApplication,
+} from "../controllers/staffApplicationController.js";
 
-// Public route: submit a staff application
-staffApplicationRouter.post("/", createStaffApplication);
+import authMiddleware from "../middlewares/authMiddleware.js";
+import roleMiddleware from "../middlewares/roleMiddleware.js";
 
-export default staffApplicationRouter;
+const staffApplicaiotnRouter = express.Router();
+
+// Public: submit staff application
+staffApplicaiotnRouter.post("/", createStaffApplication);
+
+// Admin only: view pending applications
+staffApplicaiotnRouter.get(
+  "/",
+  authMiddleware,
+  roleMiddleware("admin"),
+  getPendingStaffApplications,
+);
+
+staffApplicaiotnRouter.patch(
+  "/:id/approve",
+  authMiddleware,
+  roleMiddleware("admin"),
+  approveStaffApplication,
+);
+
+staffApplicaiotnRouter.patch(
+  "/:id/reject",
+  authMiddleware,
+  roleMiddleware("admin"),
+  rejectStaffApplication,
+);
+
+export default staffApplicaiotnRouter;
