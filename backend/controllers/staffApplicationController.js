@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import StaffApplication from "../models/StaffApplication.js";
 import User from "../models/User.js";
+import bcrypt from "bcryptjs";
 
 // 1. Submit staff application
 export const createStaffApplication = async (req, res) => {
@@ -159,10 +160,11 @@ export const getPendingStaffApplications = async (req, res) => {
   }
 };
 
-//4. admin approval of staff applications
+// 4. Admin approval + staff account creation
 export const approveStaffApplication = async (req, res) => {
   try {
     const { id } = req.params;
+    const { password } = req.body;
 
     // 1. Validate application ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -172,7 +174,15 @@ export const approveStaffApplication = async (req, res) => {
       });
     }
 
-    // 2. Find pending application
+    // 2. Validate temporary password
+    if (typeof password !== "string" || password.length < 12) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 12 characters long",
+      });
+    }
+
+    // 3. Find pending application
     const application = await StaffApplication.findOne({
       _id: id,
       status: "PENDING",
@@ -185,19 +195,35 @@ export const approveStaffApplication = async (req, res) => {
       });
     }
 
-    // 3. Check whether email already belongs to a user
+    // 4. Check existing email or phone
     const existingUser = await User.findOne({
-      email: application.email,
+      $or: [
+        { email: application.email },
+        { phone: application.phone },
+      ],
     });
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "A user with this email already exists",
+        message: "A user with this email or phone already exists",
       });
     }
 
-    // 4. Approve application
+    // 5. Hash password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // 6. Create staff account
+    const staffUser = await User.create({
+      name: application.name,
+      email: application.email,
+      phone: application.phone,
+      password: hashedPassword,
+      role: "staff",
+      isActive: true,
+    });
+
+    // 7. Approve application
     application.status = "APPROVED";
     application.reviewedBy = req.user.id;
     application.reviewedAt = new Date();
@@ -206,11 +232,23 @@ export const approveStaffApplication = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Staff application approved successfully",
-      application,
+      message: "Staff application approved and account created successfully",
+      staff: {
+        id: staffUser._id,
+        name: staffUser.name,
+        email: staffUser.email,
+        role: staffUser.role,
+      },
     });
   } catch (error) {
     console.error("Approve staff application error:", error);
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "A user with these details already exists",
+      });
+    }
 
     return res.status(500).json({
       success: false,
