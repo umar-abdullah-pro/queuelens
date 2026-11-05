@@ -8,10 +8,8 @@ import {
   deactivateService,
 } from "../controllers/serviceController.js";
 
-import {
-  authMiddleware,
-  roleMiddleware,
-} from "../middlewares/authmiddleware.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const serviceRouter = express.Router();
 
