@@ -35,9 +35,9 @@ const Register = () => {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-100 p-5">
-      <div className="grid w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-2xl shadow-slate-300/50 md:min-h-[620px] md:grid-cols-2">
+      <div className="grid w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-2xl shadow-slate-300/50 md:min-h-155 md:grid-cols-2">
         {/* Branding panel */}
-        <section className="relative flex flex-col justify-between overflow-hidden bg-gradient-to-br from-teal-700 via-teal-800 to-slate-900 p-8 text-white sm:p-12">
+        <section className="relative flex flex-col justify-between overflow-hidden bg-linear-to-br from-teal-700 via-teal-800 to-slate-900 p-8 text-white sm:p-12">
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full border border-white/10" />
           <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full border border-white/10" />
           <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-teal-400/10" />
