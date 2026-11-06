@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const appointmentSchema = new mongoose.Schema(
@@ -54,13 +53,19 @@ const appointmentSchema = new mongoose.Schema(
       default: null,
     },
 
+    actualDurationMinutes: {
+      type: Number,
+      default: null,
+      min: 0,
+    },
+
     notes: {
       type: String,
       trim: true,
       maxlength: 500,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Useful for retrieving a patient's appointment history

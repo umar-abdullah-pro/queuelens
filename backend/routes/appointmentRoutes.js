@@ -7,20 +7,21 @@ import {
   checkInAppointment,
   getQueueStatus,
   getStaffQueue,
+  startAppointment,
+  completeAppointment,
 } from "../controllers/appointmentController.js";
 
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const appointmentRouter = express.Router();
-
-// All appointment routes require authentication.
 appointmentRouter.use(authMiddleware);
 
-// Patient routes
+appointmentRouter.get("/mine", roleMiddleware("patient"), getMyAppointments);
+
 appointmentRouter.post("/", roleMiddleware("patient"), createAppointment);
 
-appointmentRouter.get("/mine", roleMiddleware("patient"), getMyAppointments);
+appointmentRouter.get("/staff/queue", roleMiddleware("staff"), getStaffQueue);
 
 appointmentRouter.patch(
   "/:id/cancel",
@@ -36,7 +37,16 @@ appointmentRouter.patch(
 
 appointmentRouter.get("/:id/queue", roleMiddleware("patient"), getQueueStatus);
 
-// Staff route
-appointmentRouter.get("/staff/queue", roleMiddleware("staff"), getStaffQueue);
+appointmentRouter.patch(
+  "/:id/start",
+  roleMiddleware("staff"),
+  startAppointment,
+);
+
+appointmentRouter.patch(
+  "/:id/complete",
+  roleMiddleware("staff"),
+  completeAppointment,
+);
 
 export default appointmentRouter;

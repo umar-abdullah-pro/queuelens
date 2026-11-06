@@ -322,3 +322,129 @@ export const getStaffQueue = async (req, res) => {
     });
   }
 };
+
+// 7. Staff starts an appointment
+export const startAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid appointment ID.",
+      });
+    }
+
+    const appointment = await Appointment.findById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found.",
+      });
+    }
+
+    if (appointment.status !== "CHECKED_IN") {
+      return res.status(400).json({
+        success: false,
+        message: "Only checked-in appointments can be started.",
+      });
+    }
+
+    const service = await Service.findOne({
+      _id: appointment.serviceId,
+      staffIds: req.user.id,
+      isActive: true,
+    });
+
+    if (!service) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not assigned to this service.",
+      });
+    }
+
+    appointment.status = "IN_PROGRESS";
+    appointment.assignedStaffId = req.user.id;
+    appointment.serviceStartedAt = new Date();
+
+    await appointment.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Appointment started successfully.",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Start appointment error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to start appointment.",
+    });
+  }
+};
+
+// 8. Staff completes an appointment
+export const completeAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid appointment ID.",
+      });
+    }
+
+    const appointment = await Appointment.findById(id);
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found.",
+      });
+    }
+
+    if (appointment.status !== "IN_PROGRESS") {
+      return res.status(400).json({
+        success: false,
+        message: "Only in-progress appointments can be completed.",
+      });
+    }
+
+    // Verify that this staff member started the appointment
+    if (appointment.assignedStaffId?.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not assigned to this appointment.",
+      });
+    }
+
+    const completedAt = new Date();
+
+    const durationMs =
+      completedAt.getTime() - appointment.serviceStartedAt.getTime();
+
+    const actualDurationMinutes = Math.ceil(durationMs / 60000);
+
+    appointment.status = "COMPLETED";
+    appointment.serviceCompletedAt = completedAt;
+    appointment.actualDurationMinutes = actualDurationMinutes;
+
+    await appointment.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Appointment completed successfully.",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Complete appointment error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to complete appointment.",
+    });
+  }
+};
