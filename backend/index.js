@@ -25,6 +25,8 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
@@ -54,7 +56,7 @@ const startServer = async () => {
     await connectDB();
 
     updateNoShowAppointments(); // Call the function to update no-show appointments
-    
+
     // Schedule the no-show update to run every 5 minutes
     setInterval(updateNoShowAppointments, 5 * 60 * 1000);
 
