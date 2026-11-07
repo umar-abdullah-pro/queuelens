@@ -5,7 +5,7 @@ import {
   logout,
   getMe,
 } from "../controllers/authController.js";
-import authMiddleware from "../middlewares/authmiddleware.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const authRouter = express.Router();
 
