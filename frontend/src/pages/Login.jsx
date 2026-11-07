@@ -1,21 +1,26 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../services/api";
+import { useAuth } from "../app/AuthProvider";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setError("");
     setLoading(true);
 
     const formData = new FormData(event.target);
 
     try {
-      const res = await api("/auth/login", {
+      // Authenticate the user
+      await api("/auth/login", {
         method: "POST",
         body: JSON.stringify({
           email: formData.get("email"),
@@ -23,16 +28,24 @@ const Login = () => {
         }),
       });
 
-      const role = res.user.role;
+      // Get the authenticated user from the shared AuthProvider
+      const user = await refreshUser();
 
-      if (role === "patient") {
-        navigate("/patient/dashboard");
-      } else if (role === "staff") {
-        navigate("/staff/dashboard");
-      } else if (role === "admin") {
-        navigate("/admin/dashboard");
+      // Redirect according to the user's role
+      const dashboardRoutes = {
+        patient: "/patient/dashboard",
+        staff: "/staff/dashboard",
+        admin: "/admin/dashboard",
+      };
+
+      const destination = dashboardRoutes[user?.role];
+
+      if (!destination) {
+        setError("Your account has an unsupported role.");
+        return;
       }
 
+      navigate(destination, { replace: true });
     } catch (error) {
       setError(error.message || "Login failed. Please try again.");
     } finally {
@@ -45,7 +58,6 @@ const Login = () => {
       <div className="grid w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-2xl shadow-slate-300/50 md:min-h-145 md:grid-cols-2">
         {/* Branding panel */}
         <section className="relative flex flex-col justify-between overflow-hidden bg-linear-to-br from-teal-700 via-teal-800 to-slate-900 p-8 text-white sm:p-12">
-          {/* Decorative circles */}
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full border border-white/10" />
           <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full border border-white/10" />
           <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-teal-400/10" />

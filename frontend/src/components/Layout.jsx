@@ -1,5 +1,5 @@
 import { Outlet, useOutletContext } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "./layout/Sidebar";
 
 const Layout = () => {
   const { user } = useOutletContext();

@@ -4,28 +4,33 @@ import { api } from "../services/api";
 
 const Register = () => {
   const navigate = useNavigate();
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     setError("");
     setLoading(true);
 
-    const formData = new FormData(event.target);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const userData = {
+      name: formData.get("name").trim(),
+      email: formData.get("email").trim(),
+      phone: formData.get("phone").trim(),
+      password: formData.get("password"),
+    };
 
     try {
       await api("/auth/register", {
         method: "POST",
-        body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email"),
-          phone: formData.get("phone"),
-          password: formData.get("password"),
-        }),
+        body: JSON.stringify(userData),
       });
 
-      navigate("/login");
+      navigate("/login", { replace: true });
     } catch (error) {
       setError(error.message || "Registration failed. Please try again.");
     } finally {
@@ -97,6 +102,7 @@ const Register = () => {
                   type="text"
                   name="name"
                   placeholder="Your full name"
+                  autoComplete="name"
                   required
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:bg-white focus:ring-4 focus:ring-teal-50"
                 />
@@ -111,6 +117,7 @@ const Register = () => {
                   type="email"
                   name="email"
                   placeholder="you@example.com"
+                  autoComplete="email"
                   required
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:bg-white focus:ring-4 focus:ring-teal-50"
                 />
@@ -126,6 +133,7 @@ const Register = () => {
                   type="tel"
                   name="phone"
                   placeholder="Enter your phone number"
+                  autoComplete="tel"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:bg-white focus:ring-4 focus:ring-teal-50"
                 />
               </div>
@@ -139,6 +147,7 @@ const Register = () => {
                   type="password"
                   name="password"
                   placeholder="Create a password (minimum 8 characters)"
+                  autoComplete="new-password"
                   minLength={8}
                   required
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-teal-600 focus:bg-white focus:ring-4 focus:ring-teal-50"
@@ -146,7 +155,10 @@ const Register = () => {
               </div>
 
               {error && (
-                <p className="rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600">
+                <p
+                  role="alert"
+                  className="rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-600"
+                >
                   {error}
                 </p>
               )}
