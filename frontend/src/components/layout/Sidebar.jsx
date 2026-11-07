@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { api } from "../services/api";
 
+import { useAuth } from "../../app/AuthProvider";
 const Sidebar = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const dashboardPaths = {
     patient: "/patient/dashboard",
@@ -14,17 +15,15 @@ const Sidebar = ({ user }) => {
 
   const dashboardPath = dashboardPaths[user?.role];
 
-  const handleLogout = async () => {
-    try {
-      await api("/auth/logout", {
-        method: "POST",
-      });
+ const handleLogout = async () => {
+  try {
+    await logout();
 
-      navigate("/login", { replace: true });
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+    navigate("/login", { replace: true });
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
 
   return (
     <>

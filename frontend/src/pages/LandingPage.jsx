@@ -1,6 +1,53 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../app/AuthProvider";
+
+const dashboardRoutes = {
+  patient: "/patient/dashboard",
+  staff: "/staff/dashboard",
+  admin: "/admin/dashboard",
+};
+
+const features = [
+  {
+    icon: "📅",
+    title: "Easy Appointments",
+    description: "Browse available services and book your appointments online.",
+  },
+  {
+    icon: "📍",
+    title: "Live Queue Tracking",
+    description: "Check your queue position and estimated waiting time.",
+  },
+  {
+    icon: "⚡",
+    title: "Digital Check-In",
+    description: "Check in digitally and keep track of your visit status.",
+  },
+];
+
+const steps = [
+  {
+    number: "01",
+    title: "Book an Appointment",
+    description: "Choose a healthcare service and schedule your visit.",
+  },
+  {
+    number: "02",
+    title: "Check In",
+    description: "Check in digitally when you arrive at the healthcare center.",
+  },
+  {
+    number: "03",
+    title: "Track Your Queue",
+    description: "Follow your queue position while waiting for your turn.",
+  },
+];
 
 const LandingPage = () => {
+  const { user, loading } = useAuth();
+
+  const dashboardPath = user ? dashboardRoutes[user.role] : null;
+
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -28,19 +75,30 @@ const LandingPage = () => {
             </p>
 
             <div className="mt-9 flex flex-wrap gap-4">
-              <Link
-                to="/register"
-                className="rounded-xl bg-white px-7 py-4 text-sm font-bold text-teal-800 shadow-lg transition hover:-translate-y-1 hover:bg-teal-50"
-              >
-                Get Started
-              </Link>
+              {!loading && dashboardPath ? (
+                <Link
+                  to={dashboardPath}
+                  className="rounded-xl bg-white px-7 py-4 text-sm font-bold text-teal-800 shadow-lg transition hover:-translate-y-1 hover:bg-teal-50"
+                >
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/register"
+                    className="rounded-xl bg-white px-7 py-4 text-sm font-bold text-teal-800 shadow-lg transition hover:-translate-y-1 hover:bg-teal-50"
+                  >
+                    Get Started
+                  </Link>
 
-              <Link
-                to="/login"
-                className="rounded-xl border border-white/30 px-7 py-4 text-sm font-semibold text-white transition hover:bg-white/10"
-              >
-                Sign In
-              </Link>
+                  <Link
+                    to="/login"
+                    className="rounded-xl border border-white/30 px-7 py-4 text-sm font-semibold text-white transition hover:bg-white/10"
+                  >
+                    Sign In
+                  </Link>
+                </>
+              )}
             </div>
 
             <p className="mt-8 text-xs text-teal-100/70">
@@ -122,26 +180,7 @@ const LandingPage = () => {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              icon: "📅",
-              title: "Easy Appointments",
-              description:
-                "Browse available services and book your appointments online.",
-            },
-            {
-              icon: "📍",
-              title: "Live Queue Tracking",
-              description:
-                "Check your queue position and estimated waiting time.",
-            },
-            {
-              icon: "⚡",
-              title: "Digital Check-In",
-              description:
-                "Check in digitally and keep track of your visit status.",
-            },
-          ].map((feature) => (
+          {features.map((feature) => (
             <div
               key={feature.title}
               className="rounded-2xl border border-slate-100 bg-slate-50 p-8 transition hover:-translate-y-1 hover:shadow-lg"
@@ -174,26 +213,7 @@ const LandingPage = () => {
           </div>
 
           <div className="grid gap-10 md:grid-cols-3">
-            {[
-              {
-                number: "01",
-                title: "Book an Appointment",
-                description:
-                  "Choose a healthcare service and schedule your visit.",
-              },
-              {
-                number: "02",
-                title: "Check In",
-                description:
-                  "Check in digitally when you arrive at the healthcare center.",
-              },
-              {
-                number: "03",
-                title: "Track Your Queue",
-                description:
-                  "Follow your queue position while waiting for your turn.",
-              },
-            ].map((step) => (
+            {steps.map((step) => (
               <div key={step.number} className="text-center">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-700 text-xl font-bold text-white shadow-lg shadow-teal-700/20">
                   {step.number}
@@ -224,12 +244,14 @@ const LandingPage = () => {
             simpler.
           </p>
 
-          <Link
-            to="/register"
-            className="mt-8 inline-block rounded-xl bg-white px-7 py-4 text-sm font-bold text-teal-800 transition hover:bg-teal-50"
-          >
-            Create Your Account
-          </Link>
+          {!loading && (
+            <Link
+              to={dashboardPath || "/register"}
+              className="mt-8 inline-block rounded-xl bg-white px-7 py-4 text-sm font-bold text-teal-800 transition hover:bg-teal-50"
+            >
+              {dashboardPath ? "Go to Dashboard" : "Create Your Account"}
+            </Link>
+          )}
         </div>
       </section>
 
