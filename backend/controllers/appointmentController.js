@@ -191,6 +191,23 @@ export const checkInAppointment = async (req, res) => {
       });
     }
 
+    // 5. Check 15-minute grace period
+    const checkInDeadline = new Date(
+      appointment.scheduledAt.getTime() + 15 * 60 * 1000
+    );
+
+    const now = new Date();
+
+    if (now > checkInDeadline) {
+      appointment.status = "NO_SHOW";
+      await appointment.save();
+
+      return res.status(400).json({
+        success: false,
+        message: "Check-in time has expired. Appointment marked as NO_SHOW.",
+      });
+    }
+    //6. Fcheck-in patient
     appointment.status = "CHECKED_IN";
     appointment.checkedInAt = new Date();
 

@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import BookAppointment from "./pages/BookAppointment"
 
 import PatientDashboard from "./pages/PatientDashboard";
 // import StaffDashboard from "./pages/StaffDashboard";
@@ -22,13 +23,14 @@ function App() {
       {/* Protected Routes */}
       <Route
         element={
-          <ProtectedRoutes allowedRoles={["patient", "staff", "admin"]} />
+          <ProtectedRoutes allowedRoles={["patient"]} />
         }
       >
         <Route element={<Layout />}>
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
           {/*<Route path="/staff/dashboard" element={<StaffDashboard />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
+          <Route path="/patient/book-appointment" element={<BookAppointment />} />
         </Route>
       </Route>
     </Routes>

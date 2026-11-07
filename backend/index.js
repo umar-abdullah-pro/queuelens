@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import serviceRouter from "./routes/serviceRoutes.js";
 import appointmentRouter from "./routes/appointmentRoutes.js";
 import staffApplicationRouter from "./routes/staffApplicationRouter.js";
+import updateNoShowAppointments from "./services/noShowService.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -51,6 +52,11 @@ app.use("/api/staff-applications", staffApplicationRouter);
 const startServer = async () => {
   try {
     await connectDB();
+
+    updateNoShowAppointments(); // Call the function to update no-show appointments
+    
+    // Schedule the no-show update to run every 5 minutes
+    setInterval(updateNoShowAppointments, 5 * 60 * 1000);
 
     app.listen(PORT, () => {
       console.log(`QueueLens API running on port ${PORT}`);
