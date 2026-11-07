@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PatientDashboard from "./pages/PatientDashboard";
+import BookAppointment from "./pages/BookAppointment";
 
 function StaffDashboard() {
   return (
@@ -39,6 +40,15 @@ function App() {
               <DashboardLayout>
                 <PatientDashboard />
               </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient/book"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <BookAppointment/>
             </ProtectedRoute>
           }
         />
