@@ -34,7 +34,7 @@ const ProtectedRoutes = ({ allowedRoles }) => {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />;
+  return <Outlet context={{user}} />;
 };
 
 export default ProtectedRoutes;

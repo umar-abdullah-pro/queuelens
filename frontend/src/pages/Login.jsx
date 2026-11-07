@@ -15,7 +15,7 @@ const Login = () => {
     const formData = new FormData(event.target);
 
     try {
-      await api("/auth/login", {
+      const res = await api("/auth/login", {
         method: "POST",
         body: JSON.stringify({
           email: formData.get("email"),
@@ -23,7 +23,7 @@ const Login = () => {
         }),
       });
 
-      const role = data.user.role;
+      const role = res.user.role;
 
       if (role === "patient") {
         navigate("/patient/dashboard");
@@ -32,7 +32,7 @@ const Login = () => {
       } else if (role === "admin") {
         navigate("/admin/dashboard");
       }
-      
+
     } catch (error) {
       setError(error.message || "Login failed. Please try again.");
     } finally {
