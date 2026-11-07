@@ -2,17 +2,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import DashboardLayout from "./components/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
-function PatientDashboard() {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800">Patient Dashboard</h1>
-      <p className="mt-2 text-slate-500">Welcome to QueueLens.</p>
-    </div>
-  );
-}
+import PatientDashboard from "./pages/PatientDashboard";
 
 function StaffDashboard() {
   return (
@@ -71,9 +64,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
