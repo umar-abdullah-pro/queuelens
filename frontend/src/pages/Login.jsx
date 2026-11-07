@@ -23,7 +23,16 @@ const Login = () => {
         }),
       });
 
-      navigate("/dashboard");
+      const role = data.user.role;
+
+      if (role === "patient") {
+        navigate("/patient/dashboard");
+      } else if (role === "staff") {
+        navigate("/staff/dashboard");
+      } else if (role === "admin") {
+        navigate("/admin/dashboard");
+      }
+      
     } catch (error) {
       setError(error.message || "Login failed. Please try again.");
     } finally {
@@ -34,10 +43,8 @@ const Login = () => {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-100 p-5">
       <div className="grid w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-2xl shadow-slate-300/50 md:min-h-145 md:grid-cols-2">
-
         {/* Branding panel */}
         <section className="relative flex flex-col justify-between overflow-hidden bg-linear-to-br from-teal-700 via-teal-800 to-slate-900 p-8 text-white sm:p-12">
-
           {/* Decorative circles */}
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full border border-white/10" />
           <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full border border-white/10" />
@@ -61,8 +68,8 @@ const Login = () => {
             </h2>
 
             <p className="mt-6 max-w-sm text-sm leading-7 text-slate-200">
-              Book appointments, stay updated on your queue, and
-              experience a smarter way to manage healthcare visits.
+              Book appointments, stay updated on your queue, and experience a
+              smarter way to manage healthcare visits.
             </p>
           </div>
 
@@ -74,7 +81,6 @@ const Login = () => {
         {/* Login panel */}
         <section className="flex items-center justify-center p-8 sm:p-12">
           <div className="w-full max-w-sm">
-
             <div className="mb-9">
               <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-teal-700">
                 Account Login
@@ -144,7 +150,6 @@ const Login = () => {
                 Create an account
               </Link>
             </p>
-
           </div>
         </section>
       </div>
